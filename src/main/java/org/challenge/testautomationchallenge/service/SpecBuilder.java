@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.challenge.testautomationchallenge.utils.AuthHeaderUtils;
 
+import java.util.Map;
+
 @Service
 public class SpecBuilder {
 
@@ -22,8 +24,53 @@ public class SpecBuilder {
         return new RequestSpecBuilder()
                 .setBaseUri(baseUrlConfig.getBaseUrl())
                 .setContentType(ContentType.JSON)
+                .addFilter(new AllureRestAssured())
+                .build();
+    }
+
+    public RequestSpecification buildRequestSpecAcct(){
+        return new RequestSpecBuilder()
+                .setBaseUri(baseUrlConfig.getBaseUrl())
+                .setContentType(ContentType.JSON)
                 .setAuth(httpBuilder -> {
-                    httpBuilder.setHeaders(authHeaderUtils.createHeaderAuth());
+                    httpBuilder.setHeaders(authHeaderUtils.createHeaderAuth
+                            (authHeaderUtils.getEncodedBearerTokenAcct()));
+                })
+                .addFilter(new AllureRestAssured())
+                .build();
+    }
+
+    public RequestSpecification buildRequestSpecAccountConsentId(String consentId){
+        return new RequestSpecBuilder()
+                .setBaseUri(baseUrlConfig.getBaseUrl())
+                .setContentType(ContentType.JSON)
+                .setAuth(httpBuilder -> {
+                    httpBuilder.setHeaders(authHeaderUtils.createHeaderAuth
+                            (authHeaderUtils.getEncodedBearerTokenAcctConsentId(consentId)));
+                })
+                .addFilter(new AllureRestAssured())
+                .build();
+    }
+
+    public RequestSpecification buildRequestSpecConsent(){
+        return new RequestSpecBuilder()
+                .setBaseUri(baseUrlConfig.getBaseUrl())
+                .setContentType(ContentType.JSON)
+                .setAuth(httpBuilder -> {
+                    httpBuilder.setHeaders(authHeaderUtils.createHeaderAuth
+                            (authHeaderUtils.getEncodedBearerTokenConsent()));
+                })
+                .addFilter(new AllureRestAssured())
+                .build();
+    }
+
+    public RequestSpecification buildRequestSpecCreditCard(){
+        return new RequestSpecBuilder()
+                .setBaseUri(baseUrlConfig.getBaseUrl())
+                .setContentType(ContentType.JSON)
+                .setAuth(httpBuilder -> {
+                    httpBuilder.setHeaders(authHeaderUtils.createHeaderAuth
+                            (authHeaderUtils.getEncodedBearerTokenCreditCard()));
                 })
                 .addFilter(new AllureRestAssured())
                 .build();

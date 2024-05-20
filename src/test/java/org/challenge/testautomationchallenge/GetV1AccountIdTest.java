@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.challenge.testautomationchallenge.service.http.GetHttp;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -26,11 +25,8 @@ public class GetV1AccountIdTest {
 
     @Test
     void getExistentAcctIdValidBearer(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().statusCode(200)
+        Response response = getHttp.getApi("account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74", 200);
+        response.then().statusCode(200)
                 .log().body()
                 .assertThat()
                 .body("data.id", notNullValue())
@@ -44,21 +40,16 @@ public class GetV1AccountIdTest {
 
     @Test
     void getInvalidUuidAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/aaa")
-                .then().log().ifValidationFails().statusCode(400)
-                .extract().response();
+        Response response = getHttp.getApi("account/v1/account/aaa", 400);
+        response.then().statusCode(404)
+                .assertThat()
+                .body("message", equalTo("Bad Request"));
     }
 
     @Test
     void getWithNoTokenAcctId(){
-        given()
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(401)
-                .extract().response()
-                .then()
+        Response response = getHttp.getApiNoToken("account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74", 401);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(401))
                 .body("message", equalTo("Unauthorized"))
@@ -68,13 +59,8 @@ public class GetV1AccountIdTest {
 
     @Test
     void getWithConsentRoleAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjb25zZW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(403)
-                .extract().response()
-                .then()
+        Response response = getHttp.getConsentApi("account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74", 403);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(403))
                 .body("message", equalTo("Forbidden"))
@@ -84,13 +70,8 @@ public class GetV1AccountIdTest {
 
     @Test
     void getWithAccountRoleAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(200)
-                .extract().response()
-                .then()
+        Response response = getHttp.getApi("account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74", 200);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(200))
                 .assertThat()
@@ -106,13 +87,9 @@ public class GetV1AccountIdTest {
 
     @Test
     void getWithCreditCardsRoleAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MSJ9.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(403)
-                .extract().response()
-                .then()
+        Response response = getHttp.getCreditCardApi("account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74"
+                , 403);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(403))
                 .body("message", equalTo("Forbidden"))
@@ -122,13 +99,9 @@ public class GetV1AccountIdTest {
 
     @Test
     void getWithWrongPathUriAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MSJ9.")
-                .request("GET", "http://localhost:8080/test-api/accounts/v1/accounts/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(404)
-                .extract().response()
-                .then()
+        Response response = getHttp.getCreditCardApi("accounts/v1/accounts/87caf37b-f70f-440c-bacd-3b9399ca5d74"
+                , 404);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(404))
                 .body("message", equalTo("Not Found"))
@@ -138,13 +111,9 @@ public class GetV1AccountIdTest {
 
     @Test
     void getWithClientWaitAuthorisationAcctId(){
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQyIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/account/87caf37b-f70f-440c-bacd-3b9399ca5d74")
-                .then().log().ifValidationFails().statusCode(403)
-                .extract().response()
-                .then()
+        Response response = getHttp.getApi("accounts/v1/accounts/87caf37b-f70f-440c-bacd-3b9399ca5d74"
+                , 403);
+        response.then()
                 .log()
                 .ifStatusCodeMatches(equalTo(403))
                 .body("message", equalTo("Forbidden"))
