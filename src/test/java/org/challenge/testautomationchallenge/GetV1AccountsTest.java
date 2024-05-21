@@ -1,232 +1,110 @@
 package org.challenge.testautomationchallenge;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import io.restassured.response.Response;
+import org.challenge.testautomationchallenge.service.http.GetHttp;
+import org.challenge.testautomationchallenge.service.http.PostHttp;
+import org.challenge.testautomationchallenge.services.AccountService;
+import org.challenge.testautomationchallenge.services.ConsentService;
+import org.challenge.testautomationchallenge.utils.ConsentStatusEnum;
 
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 
 @SpringBootTest
 class GetV1AccountsTest {
+    @Autowired
+    protected GetHttp getHttp;
+    @Autowired
+    protected PostHttp postHttp;
+    @Autowired
+    protected ConsentService consentService;
+    @Autowired
+    protected AccountService accountService;
+    protected String consentId = "";
 
     @Test
     void getAcctListValidBearer() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(200)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(200))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("id", hasSize(2))
-                .body("bank", hasItems("Nubank", "Itau"))
-                .body("accountNumero", hasSize(2))
-                .body("links", hasSize(2))
-                .body("meta.totalRecords", greaterThan(2))
-                .body("meta.totalPages", greaterThan(0));
-
+        consentId = consentService.postClientConsentId();
+        consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
+        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+                , consentId, 200);
+        accountService.assertAccountListSuccessPayload(response, 200);
     }
 
     @Test
     void getAcctListNoToken() {
-        given()
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(401)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(401))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Unauthorized"));
-
+        Response response = getHttp.getApiNoToken("account/v1/accounts"
+                , 401);
+        accountService.assertAccountErrorMsgEqual(response, 401, "message", "Unauthorized");
     }
 
     @Test
     void getAcctListConsentRoleBearer() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjb25zZW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(403)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(403))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Forbidden"));
-
+        Response response = getHttp.getConsentApi("account/v1/accounts"
+                , 403);
+        accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
 
     @Test
     void getAcctListAccountRoleBearer() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQxIn0=.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(200)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(200))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("id", hasSize(2))
-                .body("bank", hasItems("Nubank", "Itau"))
-                .body("accountNumero", hasSize(2))
-                .body("links", hasSize(2))
-                .body("meta.totalRecords", greaterThan(2))
-                .body("meta.totalPages", greaterThan(0));
-
+        consentId = consentService.postClientConsentId();
+        consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
+        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+                , consentId, 200);
+        accountService.assertAccountListSuccessPayload(response, 200);
     }
 
     @Test
     void getAcctListCreditCardRoleBearer() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MSJ9.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(403)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(403))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Forbidden"));
-
+        Response response = getHttp.getCreditCardApi("account/v1/accounts"
+                , 403);
+        accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
 
     @Test
     void getAcctListWrongUriPath() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MSJ9.")
-                .request("GET", "http://localhost:8080/test-api/accounts/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(404)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(404))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Not Found"));
-
+        consentId = consentService.postClientConsentId();
+        consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
+        Response response = getHttp.getAccountConsentIdApi("accounts/v1/accounts"
+                , consentId, 404);
+        accountService.assertAccountErrorMsgEqual(response, 404, "message", "Not Found");
     }
 
     @Test
     void getAcctListClientWaitingAuthorisation() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MiJ9.")
-                .request("GET", "http://localhost:8080/test-api/accounts/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(403)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(403))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Forbidden"));
+        consentId = consentService.postClientConsentId();
+        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+                , consentId, 403);
+        accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
 
     @Test
     void getAcctListConsentIdNull() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJjcmVkaXQtY2FyZHMiLCJjbGllbnRfaWQiOiAiY2xpZW50MiJ9.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(400)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(400))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("message", equalTo("Bad Request"))
-                .body("message", contains("Consent Id is null"));
+        Response response = getHttp.getApi("account/v1/accounts"
+                , 400);
+        accountService.assertAccountErrorMsgEqual(response, 400, "message", "Bad Request");
+        accountService.assertAccountErrorMsgContains(response, 400, "message"
+                , "Consent Id not present on the request");
     }
 
     @Test
     void getAcctListConsentIdPassed() {
-        given()
-                .header("Authorization",
-                        "Bearer eyJhbGciOiAibm9uZSIsInR5cCI6ICJKV1QifQ==.eyJzY29wZSI6ICJhY2NvdW50cyIsImNsaWVudF9pZCI6ICJjbGllbnQyIiwgImNvbnNlbnRJZCI6InVybjpiYW5rOjQ3ODRkYmVhLTBiYzQtNDI2Mi04MzYyLTQ1OTBhZGIyNTg0ZSJ9.")
-                .request("GET", "http://localhost:8080/test-api/account/v1/accounts")
-                .then()
-                .log()
-                .ifValidationFails()
-                .statusCode(200)
-                .extract()
-                .response()
-                .then()
-                .log()
-                .ifStatusCodeMatches(equalTo(200))
-                .extract()
-                .response()
-                .then()
-                .assertThat()
-                .body("id", hasSize(2))
-                .body("bank", hasItems("Nubank", "Itau"))
-                .body("accountNumero", hasSize(2))
-                .body("links", hasSize(2))
-                .body("meta.totalRecords", greaterThan(2))
-                .body("meta.totalPages", greaterThan(0));
+        consentId = consentService.postClientConsentId();
+        consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
+        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+                , consentId, 200);
+        accountService.assertAccountListSuccessPayload(response, 200);
     }
 
+    @Test
+    void getAcctListRejected() {
+        consentId = consentService.postClientConsentId();
+        consentService.putClientStatus(consentId, ConsentStatusEnum.status.REJECTED.name());
+        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+                , consentId, 403);
+        accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
+    }
 
 }

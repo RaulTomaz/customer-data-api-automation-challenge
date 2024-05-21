@@ -8,12 +8,13 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.challenge.testautomationchallenge.utils.AuthHeaderUtils;
 
 import java.util.Map;
 
-@Service
+@Component
 public class SpecBuilder {
 
     @Autowired
@@ -25,6 +26,7 @@ public class SpecBuilder {
                 .setBaseUri(baseUrlConfig.getBaseUrl())
                 .setContentType(ContentType.JSON)
                 .addFilter(new AllureRestAssured())
+                .setUrlEncodingEnabled(false)
                 .build();
     }
 
@@ -37,6 +39,7 @@ public class SpecBuilder {
                             (authHeaderUtils.getEncodedBearerTokenAcct()));
                 })
                 .addFilter(new AllureRestAssured())
+                .setUrlEncodingEnabled(false)
                 .build();
     }
 
@@ -49,6 +52,7 @@ public class SpecBuilder {
                             (authHeaderUtils.getEncodedBearerTokenAcctConsentId(consentId)));
                 })
                 .addFilter(new AllureRestAssured())
+                .setUrlEncodingEnabled(false)
                 .build();
     }
 
@@ -61,6 +65,7 @@ public class SpecBuilder {
                             (authHeaderUtils.getEncodedBearerTokenConsent()));
                 })
                 .addFilter(new AllureRestAssured())
+                .setUrlEncodingEnabled(false)
                 .build();
     }
 
@@ -73,6 +78,7 @@ public class SpecBuilder {
                             (authHeaderUtils.getEncodedBearerTokenCreditCard()));
                 })
                 .addFilter(new AllureRestAssured())
+                .setUrlEncodingEnabled(false)
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package org.challenge.testautomationchallenge.utils;
 
+import jakarta.annotation.PostConstruct;
 import org.challenge.testautomationchallenge.pojo.AccountPojo;
 import org.challenge.testautomationchallenge.pojo.ConsentPojo;
 import org.challenge.testautomationchallenge.pojo.CreditCardPojo;
@@ -46,7 +47,7 @@ public class AuthHeaderUtils {
     }
 
     public String encodeChallengePayloadConsent(){
-        String Json = consentPojo.returnSerializePayloadConsent();
+        String Json = consentPojo.returnSerializeTokenPayloadConsent();
         return Base64.getEncoder().encodeToString(Json.getBytes(StandardCharsets.UTF_8));
     }
 

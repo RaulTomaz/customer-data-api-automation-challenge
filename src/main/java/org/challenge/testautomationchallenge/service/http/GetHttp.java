@@ -1,6 +1,7 @@
 package org.challenge.testautomationchallenge.service.http;
 
 import io.restassured.response.Response;
+import org.challenge.testautomationchallenge.config.BaseUrlConfig;
 import org.springframework.stereotype.Service;
 import org.challenge.testautomationchallenge.service.SpecBuilder;
 
