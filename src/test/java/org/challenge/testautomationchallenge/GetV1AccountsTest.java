@@ -86,9 +86,9 @@ class GetV1AccountsTest {
     @Test
     void getAcctListConsentIdNull() {
         Response response = getHttp.getApi(routeConfig.getRouteAcctList()
-                , 400);
-        accountService.assertAccountErrorMsgEqual(response, 400, "message", "Bad Request");
-        accountService.assertAccountErrorMsgContains(response, 400, "message"
+                , 401);
+        accountService.assertAccountErrorMsgEqual(response, 401, "message", "Unauthorized");
+        accountService.assertAccountErrorMsgContains(response, 401, "message"
                 , "Consent Id not present on the request");
     }
 
