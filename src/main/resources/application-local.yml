@@ -1,1 +1,11 @@
 local.baseUrl: http://localhost:8080/test-api/
+
+route:
+  routeAcctId: "account/v1/account"
+  routeAcctList: "account/v1/accounts"
+  routeInvalidRouteAcctList: "accounts/v1/accounts"
+  routeInvalidRouteAcctId: "accounts/v1/accounts"
+  routeInvalidAcctId: "/e58c4536-454a-4608-8bf8-f0389d2ed431"
+  routeValidAcctId: "/87caf37b-f70f-440c-bacd-3b9399ca5d74"
+  routeInvalidUuidAcctId: "/aaa"
+

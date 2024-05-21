@@ -1,6 +1,7 @@
 package org.challenge.testautomationchallenge;
 
 import io.restassured.response.Response;
+import org.challenge.testautomationchallenge.config.RouteConfig;
 import org.challenge.testautomationchallenge.service.http.GetHttp;
 import org.challenge.testautomationchallenge.service.http.PostHttp;
 import org.challenge.testautomationchallenge.services.AccountService;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class GetV1AccountsTest {
     @Autowired
+    protected RouteConfig routeConfig;
+    @Autowired
     protected GetHttp getHttp;
     @Autowired
     protected PostHttp postHttp;
@@ -28,21 +31,21 @@ class GetV1AccountsTest {
     void getAcctListValidBearer() {
         consentId = consentService.postClientConsentId();
         consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
-        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi( routeConfig.getRouteAcctList()
                 , consentId, 200);
         accountService.assertAccountListSuccessPayload(response, 200);
     }
 
     @Test
     void getAcctListNoToken() {
-        Response response = getHttp.getApiNoToken("account/v1/accounts"
+        Response response = getHttp.getApiNoToken(routeConfig.getRouteAcctList()
                 , 401);
         accountService.assertAccountErrorMsgEqual(response, 401, "message", "Unauthorized");
     }
 
     @Test
     void getAcctListConsentRoleBearer() {
-        Response response = getHttp.getConsentApi("account/v1/accounts"
+        Response response = getHttp.getConsentApi(routeConfig.getRouteAcctList()
                 , 403);
         accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
@@ -51,14 +54,14 @@ class GetV1AccountsTest {
     void getAcctListAccountRoleBearer() {
         consentId = consentService.postClientConsentId();
         consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
-        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi(routeConfig.getRouteAcctList()
                 , consentId, 200);
         accountService.assertAccountListSuccessPayload(response, 200);
     }
 
     @Test
     void getAcctListCreditCardRoleBearer() {
-        Response response = getHttp.getCreditCardApi("account/v1/accounts"
+        Response response = getHttp.getCreditCardApi(routeConfig.getRouteAcctList()
                 , 403);
         accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
@@ -67,7 +70,7 @@ class GetV1AccountsTest {
     void getAcctListWrongUriPath() {
         consentId = consentService.postClientConsentId();
         consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
-        Response response = getHttp.getAccountConsentIdApi("accounts/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi(routeConfig.getRouteInvalidRouteAcctList()
                 , consentId, 404);
         accountService.assertAccountErrorMsgEqual(response, 404, "message", "Not Found");
     }
@@ -75,14 +78,14 @@ class GetV1AccountsTest {
     @Test
     void getAcctListClientWaitingAuthorisation() {
         consentId = consentService.postClientConsentId();
-        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi(routeConfig.getRouteAcctList()
                 , consentId, 403);
         accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
 
     @Test
     void getAcctListConsentIdNull() {
-        Response response = getHttp.getApi("account/v1/accounts"
+        Response response = getHttp.getApi(routeConfig.getRouteAcctList()
                 , 400);
         accountService.assertAccountErrorMsgEqual(response, 400, "message", "Bad Request");
         accountService.assertAccountErrorMsgContains(response, 400, "message"
@@ -93,7 +96,7 @@ class GetV1AccountsTest {
     void getAcctListConsentIdPassed() {
         consentId = consentService.postClientConsentId();
         consentService.putClientStatus(consentId, ConsentStatusEnum.status.AUTHORISED.name());
-        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi(routeConfig.getRouteAcctList()
                 , consentId, 200);
         accountService.assertAccountListSuccessPayload(response, 200);
     }
@@ -102,7 +105,7 @@ class GetV1AccountsTest {
     void getAcctListRejected() {
         consentId = consentService.postClientConsentId();
         consentService.putClientStatus(consentId, ConsentStatusEnum.status.REJECTED.name());
-        Response response = getHttp.getAccountConsentIdApi("account/v1/accounts"
+        Response response = getHttp.getAccountConsentIdApi(routeConfig.getRouteAcctList()
                 , consentId, 403);
         accountService.assertAccountErrorMsgEqual(response, 403, "message", "Forbidden");
     }
