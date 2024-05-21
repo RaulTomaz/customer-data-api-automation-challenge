@@ -16,7 +16,6 @@ allure-results/
 .settings
 .springBeans
 .sts4-cache
-.env
 
 ### IntelliJ IDEA ###
 .idea
