@@ -40,8 +40,8 @@ public class GetV1AccountIdTest {
     @Test
     void getInvalidUuidAcctId(){
         Response response = getHttp.getApi(routeConfig.getRouteAcctId() + routeConfig.getRouteInvalidUuidAcctId()
-                , 400);
-        accountService.assertAccountErrorMsgEqual(response, 400, "message", "Bad Request");
+                , 404);
+        accountService.assertAccountErrorMsgEqual(response, 404, "message", "Not Found");
     }
 
     @Test
