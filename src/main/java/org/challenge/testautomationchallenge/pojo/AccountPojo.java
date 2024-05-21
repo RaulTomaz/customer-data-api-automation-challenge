@@ -10,11 +10,11 @@ public class AccountPojo {
 
     ObjectMapper objectMapper = new ObjectMapper();
     Account account = new Account();
+    File file = new File("src/main/java/org/challenge/testautomationchallenge/data/payload-accounts.json");
 
     @SneakyThrows
     public void deserializePayloadAcct() {
-        account = objectMapper.readValue(new File
-                ("src/main/java/org/challenge/testautomationchallenge/data/payload-accounts.json"), Account.class);
+        account = objectMapper.readValue(file, Account.class);
     }
 
     @SneakyThrows

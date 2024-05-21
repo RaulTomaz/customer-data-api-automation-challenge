@@ -7,5 +7,4 @@ public class Header {
     private String alg;
     private String typ;
 
-
 }

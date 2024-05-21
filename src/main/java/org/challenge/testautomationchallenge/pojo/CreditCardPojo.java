@@ -9,12 +9,11 @@ import java.io.File;
 public class CreditCardPojo {
     ObjectMapper objectMapper = new ObjectMapper();
     CreditCard creditCard = new CreditCard();
+    File file = new File("src/main/java/org/challenge/testautomationchallenge/data/payload-credit-card.json");
 
     @SneakyThrows
     public void returnDeserializePayloadCreditCard() {
-        creditCard = objectMapper.readValue(new File
-                ("src/main/java/org/challenge/testautomationchallenge/data/payload-credit-card.json")
-                , CreditCard.class);
+        creditCard = objectMapper.readValue(file, CreditCard.class);
     }
 
     @SneakyThrows

@@ -9,11 +9,11 @@ import java.io.File;
 public class HeaderPojo {
     ObjectMapper objectMapper = new ObjectMapper();
     Header header = new Header();
+    File file = new File("src/main/java/org/challenge/testautomationchallenge/data/header.json");
 
     @SneakyThrows
     public void returnDeserializeHeader() {
-        header = objectMapper.readValue(new File
-                ("src/main/java/org/challenge/testautomationchallenge/data/header.json"), Header.class);
+        header = objectMapper.readValue(file, Header.class);
     }
 
     @SneakyThrows

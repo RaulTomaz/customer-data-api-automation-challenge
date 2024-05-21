@@ -14,16 +14,16 @@ public class ConsentPojo {
     ConsentPutPayload consentPutPayload = new ConsentPutPayload();
     ConsentPostData consentPostData = new ConsentPostData();
     ConsentPutData consentPutData = new ConsentPutData();
+    File file = new File("src/main/java/org/challenge/testautomationchallenge/data/payload-consents.json");
 
     @SneakyThrows
     public void deserializeTokenPayloadConsent() {
-        consentToken = objectMapper.readValue(new File
-                ("src/main/java/org/challenge/testautomationchallenge/data/payload-consents.json"), ConsentToken.class);
+        consentToken = objectMapper.readValue(file, ConsentToken.class);
     }
 
     @SneakyThrows
     public String returnSerializePostPayloadConsent(){
-        Instant instant = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+        Instant instant = Instant.now();
         consentPostPayload.setPermissions("ACCOUNTS_READ");
         consentPostPayload.setExpirationDateTime(instant.toString());
         consentPostData.setData(consentPostPayload);
