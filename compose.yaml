@@ -1,0 +1,20 @@
+# docker-compose.yaml
+version: '3'
+
+services:
+  rest-assured:
+    container_name: test_challenge
+    build: .
+    env_file:
+      - .env.example
+    entrypoint:
+    - bash
+    - -c
+    - |
+      mvn clean test
+      allure serve ./target/allure-results/ -p 4444
+    ports:
+      - "4444:4444"
+    expose:
+      - "4444"
+    network_mode: bridge
