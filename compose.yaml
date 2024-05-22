@@ -6,7 +6,7 @@ services:
     container_name: test_challenge
     build: .
     env_file:
-      - .env.example
+      - .env
     entrypoint:
     - bash
     - -c
